@@ -2,7 +2,9 @@ import telebot
 import openai
 import random
 import requests
+
 import keys
+from open_ai import ai_functions
 
 bot = telebot.TeleBot(keys.telegram_token)
 
