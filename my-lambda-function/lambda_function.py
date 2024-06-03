@@ -57,17 +57,14 @@ Use /help for a list of commands.
                 quiz_functions.start_quiz(chat_id)
             elif text == '/picture_quiz':
                 picture_quiz_functions.start_banner_quiz(chat_id)
-            else:
-                if chat_id in quiz_functions.user_state:
-                    quiz_functions.check_answer(chat_id, text)
-                elif chat_id in picture_quiz_functions.user_state:
-                    picture_quiz_functions.check_user_state(chat_id, text)
             elif text == '/search_movie':
                 send_message("What movie would you like to find? Please enter the movie name.", chat_id)
                 search_state[chat_id] = True
             else:
                 if chat_id in quiz_functions.user_state:
                     quiz_functions.check_answer(chat_id, text)
+                elif chat_id in picture_quiz_functions.user_state:
+                    picture_quiz_functions.check_user_state(chat_id, text)
                 elif chat_id in search_state:
                     poster_url = searching_functions.search_movie_poster(text)
                     movie_summary = searching_functions.search_movie_info(text)
