@@ -7,6 +7,8 @@ from quiz import picture_quiz_functions
 from search import searching_functions
 
 search_state = {}
+
+
 def send_message(message, chat_id):
     url = f'https://api.telegram.org/bot{keys.telegram_token}/sendMessage'
     payload = {
@@ -44,14 +46,18 @@ I'm here to help you find the perfect movie or series to watch. Here's what I ca
 
 🎥 Recommendations: Suggest what to watch tonight.
 ⭐ Ratings: Show you the top movies and series across various categories.
-🧩 Quizzes: Test your movie knowledge by guessing movies from stills or descriptions.
+🧩 Quizzes: Test your movie knowledge by guessing movies from banners or descriptions.
 📂 Lists: Create and manage your own lists of favorite movies or those you want to watch in the future.
 
 Use /help for a list of commands.
                 """
                 send_message(welcome_message, chat_id)
             elif text == '/help':
-                help_message = "Commands you can use: \n/start - Welcome message \n/help - List of commands \n/quiz - Start a quiz"
+                help_message = ("Commands you can use: \n/start - Welcome message "
+                                "\n/help - List of commands "
+                                "\n/search_movie - Find summary about a movie "
+                                "\n/picture_quiz "
+                                "\n/quiz - Start a quiz")
                 send_message(help_message, chat_id)
             elif text == '/quiz':
                 quiz_functions.start_quiz(chat_id)
