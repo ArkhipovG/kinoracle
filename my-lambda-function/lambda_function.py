@@ -4,6 +4,9 @@ import keys
 from random import choice
 from quiz import quiz_functions
 from quiz import picture_quiz_functions
+from search import searching_functions
+
+search_state = {}
 def send_message(message, chat_id):
     url = f'https://api.telegram.org/bot{keys.telegram_token}/sendMessage'
     payload = {
@@ -12,6 +15,17 @@ def send_message(message, chat_id):
     }
 
     r = requests.post(url, json=payload)
+
+
+def send_image(image_url, chat_id):
+    url = f'https://api.telegram.org/bot{keys.telegram_token}/sendPhoto'
+    payload = {
+        'chat_id': chat_id,
+        'photo': image_url
+    }
+
+    r = requests.post(url, json=payload)
+
 
 def lambda_handler(event, context):
     try:
@@ -48,10 +62,24 @@ Use /help for a list of commands.
                     quiz_functions.check_answer(chat_id, text)
                 elif chat_id in picture_quiz_functions.user_state:
                     picture_quiz_functions.check_user_state(chat_id, text)
+            elif text == '/search_movie':
+                send_message("What movie would you like to find? Please enter the movie name.", chat_id)
+                search_state[chat_id] = True
+            else:
+                if chat_id in quiz_functions.user_state:
+                    quiz_functions.check_answer(chat_id, text)
+                elif chat_id in search_state:
+                    poster_url = searching_functions.search_movie_poster(text)
+                    movie_summary = searching_functions.search_movie_info(text)
+                    if poster_url:
+                        send_image(poster_url, chat_id)
+                        send_message(movie_summary, chat_id)
+                    else:
+                        send_message("Sorry, I couldn't find information for that movie.", chat_id)
+                    del search_state[chat_id]  # Clear the state after processing
                 else:
                     unknown_command_message = "Sorry, I don't understand this command. Use /help for a list of commands."
                     send_message(unknown_command_message, chat_id)
-
         return {
             'statusCode': 200,
             'body': json.dumps({'status': 'ok'})
