@@ -3,7 +3,7 @@ import requests
 import keys
 from random import choice
 from quiz import quiz_functions
-
+from quiz import picture_quiz_functions
 def send_message(message, chat_id):
     url = f'https://api.telegram.org/bot{keys.telegram_token}/sendMessage'
     payload = {
@@ -41,9 +41,13 @@ Use /help for a list of commands.
                 send_message(help_message, chat_id)
             elif text == '/quiz':
                 quiz_functions.start_quiz(chat_id)
+            elif text == '/picture_quiz':
+                picture_quiz_functions.start_banner_quiz(chat_id)
             else:
                 if chat_id in quiz_functions.user_state:
                     quiz_functions.check_answer(chat_id, text)
+                elif chat_id in picture_quiz_functions.user_state:
+                    picture_quiz_functions.check_user_state(chat_id, text)
                 else:
                     unknown_command_message = "Sorry, I don't understand this command. Use /help for a list of commands."
                     send_message(unknown_command_message, chat_id)
