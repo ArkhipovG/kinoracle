@@ -40,7 +40,7 @@ def lambda_handler(event, context):
 
             if text == '/start':
                 welcome_message = """
-                👋 Hi there! Welcome to Kinoracle 🎬
+                👋 Hi there! Welcome to KinOracle 🎬
 
 I'm here to help you find the perfect movie or series to watch. Here's what I can do for you:
 
@@ -56,8 +56,8 @@ Use /help for a list of commands.
                 help_message = ("Commands you can use: \n/start - Welcome message "
                                 "\n/help - List of commands "
                                 "\n/search_movie - Find summary about a movie "
-                                "\n/picture_quiz "
-                                "\n/quiz - Start a quiz")
+                                "\n/picture_quiz - Guess the movie by picture "
+                                "\n/quiz - Guess the movie by description ")
                 send_message(help_message, chat_id)
             elif text == '/quiz':
                 quiz_functions.start_quiz(chat_id)
