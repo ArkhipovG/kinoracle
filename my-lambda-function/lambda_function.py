@@ -13,6 +13,15 @@ def send_message(message, chat_id):
 
     r = requests.post(url, json=payload)
 
+def send_image(image_url, chat_id):
+    url = f'https://api.telegram.org/bot{keys.telegram_token}/sendPhoto'
+    payload = {
+        'chat_id': chat_id,
+        'photo': image_url
+    }
+
+    r = requests.post(url, json=payload)
+
 def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
