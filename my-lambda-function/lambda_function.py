@@ -1,10 +1,10 @@
 import json
 import requests
 import keys
-from random import choice
 from quiz import quiz_functions
 from quiz import picture_quiz_functions
 from search import searching_functions
+from favorites import favorites_functions
 
 search_state = {}
 
@@ -37,6 +37,7 @@ def lambda_handler(event, context):
         if message and 'text' in message:
             chat_id = message['chat']['id']
             text = message['text']
+            user_id = message['from']['id']
 
             if text == '/start':
                 welcome_message = """
@@ -61,11 +62,21 @@ Use /help for a list of commands.
                 send_message(help_message, chat_id)
             elif text == '/quiz':
                 quiz_functions.start_quiz(chat_id)
+            elif text == '/event':
+                send_message(body, chat_id)
             elif text == '/picture_quiz':
                 picture_quiz_functions.start_banner_quiz(chat_id)
             elif text == '/search_movie':
                 send_message("What movie would you like to find? Please enter the movie name.", chat_id)
                 search_state[chat_id] = True
+            elif text.startswith('/add_favorite'):
+                movie_id = text.split(' ')[1]
+                favorites_functions.add_favorite(chat_id, movie_id)
+            elif text.startswith("/remove_favorite"):
+                movie_id = text.split(' ')[1]
+                favorites_functions.remove_favorite(chat_id, movie_id)
+            elif text == '/favorites':
+                favorites_functions.get_favorites(chat_id)
             else:
                 if chat_id in quiz_functions.user_state:
                     quiz_functions.check_answer(chat_id, text)
@@ -93,3 +104,4 @@ Use /help for a list of commands.
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
         }
+
