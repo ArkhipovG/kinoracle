@@ -117,12 +117,12 @@ def lambda_handler(event, context):
                         welcome_message = """
                         👋 Hi there! Welcome to <b>KinOracle</b> 🎬
         
-    I'm here to help you find the perfect movie or series to watch. Here's what I can do for you:
+I'm here to help you find the perfect movie or series to watch. Here's what I can do for you:
         
-    🎥 <b>Recommendations</b>: Suggest what to watch tonight.
-    ⭐ <b>Ratings</b>: Show you the top movies and series across various categories.
-    🧩 <b>Quizzes</b>: Test your movie knowledge by guessing movies from banners or descriptions.
-    📂 <b>Lists</b>: Create and manage your own lists of favorite movies or those you want to watch in the future.
+🎥 <b>Recommendations</b>: Suggest what to watch tonight.
+⭐ <b>Ratings</b>: Show you the top movies and series across various categories.
+🧩 <b>Quizzes</b>: Test your movie knowledge by guessing movies from banners or descriptions.
+📂 <b>Lists</b>: Create and manage your own lists of favorite movies or those you want to watch in the future.
         
     Use /help for a list of commands.
                         """
@@ -131,8 +131,7 @@ def lambda_handler(event, context):
                         help_message = ("Commands you can use: \n/start - Welcome message "
                                         "\n/help - List of commands "
                                         "\n/search_movie - Find summary about a movie "
-                                        "\n/picture_quiz - Guess the movie by picture "
-                                        "\n/quiz - Guess the movie by description "
+                                        "\n/quizzes - Guess the movie by description "
                                         "\n/favorites - List of your favorite movies"
                                         "\n/watchlist - List of movies you want to watch in the future "
                                         "\n/manage_lists - Manage lists commands")
@@ -144,6 +143,12 @@ def lambda_handler(event, context):
                                         "\n/add_to_watchlist - Add to watchlist"
                                         "\n/remove_from_watchlist - Remove from watchlist")
                         send_message(help_message, chat_id)
+                    elif text == '/quizzes':
+                        quizzes_message = ("Test your movie knowledge: "
+                                        "\n/picture_quiz - Guess the movie by picture "
+                                        "\n/quiz - Guess the movie by description ")
+                        send_message(quizzes_message, chat_id)
+                        quiz_functions.start_quiz(chat_id)
                     elif text == '/quiz':
                         quiz_functions.start_quiz(chat_id)
                     elif text == '/picture_quiz':
@@ -194,7 +199,7 @@ def lambda_handler(event, context):
                                 adding_buttons(chat_id, movie_id, movie_summary)
                             else:
                                 send_message("Sorry, I couldn't find information for that movie.", chat_id)
-                            del search_state[chat_id]  # Clear the state after processing
+                            del search_state[chat_id]
                         else:
                             unknown_command_message = "Sorry, I don't understand this command. Use /help for a list of commands."
                             send_message(unknown_command_message, chat_id)
