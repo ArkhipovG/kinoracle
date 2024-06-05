@@ -4,7 +4,7 @@ import boto3
 import keys
 from datetime import datetime
 
-REGION_NAME = 'eu-north-1'  # Change this to your desired region
+REGION_NAME = 'us-east-1'  # Change this to your desired region
 
 dynamodb = boto3.client('dynamodb', region_name=REGION_NAME)
 

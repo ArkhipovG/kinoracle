@@ -6,7 +6,7 @@ from quiz import picture_quiz_functions
 from search import searching_functions
 from favorites import favorites_functions
 from watchlist import watchlist_functions
-
+from gemini_api import gemini
 search_state = {}
 
 
@@ -19,28 +19,6 @@ def send_message(message, chat_id):
     }
 
     r = requests.post(url, json=payload)
-
-
-def send_image(image_url, chat_id):
-    url = f'https://api.telegram.org/bot{keys.telegram_token}/sendPhoto'
-    payload = {
-        'chat_id': chat_id,
-        'photo': image_url
-    }
-
-    r = requests.post(url, json=payload)
-
-
-# def remove_custom_keyboard(chat_id):
-#     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
-#     payload = {
-#         'chat_id': chat_id,
-#         'text': "Custom keyboard removed.",
-#         'reply_markup': {
-#             'remove_keyboard': True
-#         }
-#     }
-#     requests.post(url, json=payload)
 
 
 def adding_buttons(chat_id, movie_id, movie_summary):
@@ -148,7 +126,8 @@ I'm here to help you find the perfect movie or series to watch. Here's what I ca
                                         "\n/picture_quiz - Guess the movie by picture "
                                         "\n/quiz - Guess the movie by description ")
                         send_message(quizzes_message, chat_id)
-                        quiz_functions.start_quiz(chat_id)
+                    elif text == '/recommendations':
+                        gemini.get_gemini_response('What you would recommend me to watch tonight?', chat_id)
                     elif text == '/quiz':
                         quiz_functions.start_quiz(chat_id)
                     elif text == '/picture_quiz':
