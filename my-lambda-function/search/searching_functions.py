@@ -6,7 +6,7 @@ import random
 tmdb.API_KEY = keys.moviedb_token
 tmdb.REQUESTS_TIMEOUT = 5
 tmdb.REQUESTS_SESSION = requests.Session()
-
+import urllib.parse
 def send_message(message, chat_id):
     url = f'https://api.telegram.org/bot{keys.telegram_token}/sendMessage'
     payload = {
@@ -59,11 +59,11 @@ def search_movie_info(query):
         movie_rating = movie_info.get('vote_average')
         movie_genres = [genre['name'] for genre in movie_info['genres']]
     movie_summary = f'''
-Title: {movie_title}\n
+Title: {movie_title}     ID: {movie_id}\n
 Year: {movie_year}\n
 Rating: {movie_rating}\n
 Genres: {", ".join(movie_genres)}\n
 Overview: {movie_overview}\n
     '''
-    return movie_summary
+    return movie_summary, movie_id
 
