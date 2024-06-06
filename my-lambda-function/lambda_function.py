@@ -6,7 +6,7 @@ from quiz import picture_quiz_functions
 from search import searching_functions
 from favorites import favorites_functions
 from watchlist import watchlist_functions
-from gemini_api import gemini
+from gemini_api import recommend
 search_state = {}
 
 
@@ -16,6 +16,15 @@ def send_message(message, chat_id):
         'chat_id': chat_id,
         'text': message,
         'parse_mode': 'HTML'
+    }
+
+    r = requests.post(url, json=payload)
+
+def send_image(image_url, chat_id):
+    url = f'https://api.telegram.org/bot{keys.telegram_token}/sendPhoto'
+    payload = {
+        'chat_id': chat_id,
+        'photo': image_url
     }
 
     r = requests.post(url, json=payload)
@@ -66,6 +75,8 @@ def lambda_handler(event, context):
             elif data.startswith('add_to_favorites'):
                 movie_id = data.split(' ')[1]
                 favorites_functions.add_favorite(chat_id, movie_id)
+            elif data == 'more_movies':
+                recommend.more_recommend_movie(chat_id)
 
             answer_callback_query(callback_query['id'])
         elif 'message' in body:
@@ -86,6 +97,10 @@ def lambda_handler(event, context):
                 elif message['reply_to_message']['text'] == "Please reply with the movie ID to remove it from your favorites:":
                     movie_id = text.strip()
                     favorites_functions.remove_favorite(chat_id, movie_id)
+                elif message['reply_to_message']['text'].startswith("Please tell me more about what you'd like to watch!"):
+                    recommend.recommend_movie(text, chat_id)
+                # elif message['reply_to_message']['text'].startswith("If you already seen these movies"):
+                #     recommend.more_recommend_movie(chat_id)
             else:
                 if message and 'text' in message:
                     chat_id = message['chat']['id']
@@ -109,6 +124,7 @@ I'm here to help you find the perfect movie or series to watch. Here's what I ca
                         help_message = ("Commands you can use: \n/start - Welcome message "
                                         "\n/help - List of commands "
                                         "\n/search_movie - Find summary about a movie "
+                                        "\n/recommend - Get personalized movie suggestions"
                                         "\n/quizzes - Guess the movie by description "
                                         "\n/favorites - List of your favorite movies"
                                         "\n/watchlist - List of movies you want to watch in the future "
@@ -126,8 +142,8 @@ I'm here to help you find the perfect movie or series to watch. Here's what I ca
                                         "\n/picture_quiz - Guess the movie by picture "
                                         "\n/quiz - Guess the movie by description ")
                         send_message(quizzes_message, chat_id)
-                    elif text == '/recommendations':
-                        gemini.get_gemini_response('What you would recommend me to watch tonight?', chat_id)
+                    elif text == '/recommend':
+                        recommend.recommend_message(chat_id)
                     elif text == '/quiz':
                         quiz_functions.start_quiz(chat_id)
                     elif text == '/picture_quiz':

@@ -13,6 +13,14 @@ def send_message(message, chat_id):
 
     r = requests.post(url, json=payload)
 
+def clean_markdown(text):
+    # Remove headers
+    # Remove bold asterisks
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    # Remove italic asterisks
+    text = re.sub(r'\*(.*?)\*', r'\1', text)
+
+    return text
 
 def get_gemini_response(prompt, chat_id):
     url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent"
@@ -23,7 +31,7 @@ def get_gemini_response(prompt, chat_id):
         "contents": [
             {
                 "parts": [
-                    {"text": f'{prompt}'}
+                    {"text": prompt}
                 ]
             }
         ]
@@ -39,21 +47,14 @@ def get_gemini_response(prompt, chat_id):
         if "candidates" in response_json and len(response_json["candidates"]) > 0:
             answer = response_json["candidates"][0]["content"]["parts"][0]["text"]
             cleaned_answer = clean_markdown(answer)
-            send_message(cleaned_answer, chat_id)
+            return cleaned_answer
         else:
             send_message("No content generated.", chat_id)
     else:
         send_message('"error": response.status_code, "message": response.text}', chat_id)
 
 
-def clean_markdown(text):
-    # Remove headers
-    # Remove bold asterisks
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-    # Remove italic asterisks
-    text = re.sub(r'\*(.*?)\*', r'\1', text)
-
-    return text
 
 
-get_gemini_response("What would you recommend me to watch?", chat_id=7653415)
+
+# get_gemini_response("What would you recommend me to watch?", chat_id=7653415)
