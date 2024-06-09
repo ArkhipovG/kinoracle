@@ -115,6 +115,10 @@ def lambda_handler(event, context):
                 lists_functions.get_popular_list(chat_id)
             elif data == "upcoming_list":
                 lists_functions.get_upcoming_list(chat_id)
+            elif data == "picture_quiz":
+                picture_quiz_functions.start_banner_quiz(chat_id)
+            elif data == "description_quiz":
+                quiz_functions.start_quiz(chat_id)
 
             answer_callback_query(callback_query['id'])
         elif 'message' in body:
@@ -180,20 +184,13 @@ Use /help for a list of commands.
                                         "\n/remove_from_watchlist - Remove from watchlist")
                         send_message(help_message, chat_id)
                     elif text == '🧩 Quizzes':
-                        quizzes_message = ("Test your movie knowledge: "
-                                           "\n/picture_quiz - Guess the movie by picture "
-                                           "\n/quiz - Guess the movie by description ")
-                        send_message(quizzes_message, chat_id)
+                        quiz_functions.quiz_buttons(chat_id)
                     elif text == '/recommend':
                         recommend.recommend_message(chat_id)
                     elif text == '🗂 Lists':
                         lists_functions.list_buttons(chat_id)
                     elif text == '/keyboard':
                         disable_keyboard(chat_id)
-                    elif text == '/quiz':
-                        quiz_functions.start_quiz(chat_id)
-                    elif text == '/picture_quiz':
-                        picture_quiz_functions.start_banner_quiz(chat_id)
                     elif text == '🔍 Search':
                         send_message("What movie would you like to find? Please enter the movie name.", chat_id)
                         search_state[chat_id] = True
@@ -209,10 +206,6 @@ Use /help for a list of commands.
                         else:
                             movie_id = text.split(' ')[1]
                             favorites_functions.remove_favorite(chat_id, movie_id)
-                    # elif text == '/favorites':
-                    #     favorites_functions.get_favorites(chat_id)
-                    # elif text == '/remove_keyboard':
-                    #     remove_custom_keyboard(chat_id)
                     elif text.startswith('/add_to_watchlist'):
                         if text == '/add_to_watchlist':
                             watchlist_functions.add_to_watchlist_prompt(chat_id)

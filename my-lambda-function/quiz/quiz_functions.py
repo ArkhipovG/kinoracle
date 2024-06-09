@@ -135,14 +135,65 @@ def start_quiz(chat_id):
     user_state[chat_id] = question
     send_message(question["question"], chat_id)
 
+
 def check_answer(chat_id, user_answer):
     correct_answer = user_state.get(chat_id, {}).get("answer")
     if correct_answer:
-        if user_answer.lower() == correct_answer.lower():
-            response_message = "Correct! Want to try again? Send /quiz"
+        if correct_answer.lower().startswith(user_answer.lower()):
+            response_message = "🎉 Correct! Want to try again?"
         else:
-            response_message = f"Wrong. The correct answer was: {correct_answer}. You can try again by sending /quiz."
+            response_message = f"❌ Wrong. The correct answer was: {correct_answer}"
         del user_state[chat_id]
     else:
-        response_message = "To start again, send /quiz."
-    send_message(response_message, chat_id)
+        response_message = "To start again click here 👇"
+    quiz_buttons2(response_message, chat_id)
+
+
+def quiz_buttons(chat_id):
+    url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': "🧠 Test your movie knowledge! 🧠",
+        'reply_markup': {
+            'inline_keyboard': [
+                [
+                    {
+                        'text': 'Picture quiz',
+                        'callback_data': f'picture_quiz'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Description quiz',
+                        'callback_data': f'description_quiz'
+                    }
+                ]
+            ]
+        }
+    }
+    requests.post(url, json=payload)
+
+
+def quiz_buttons2(message, chat_id):
+    url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'reply_markup': {
+            'inline_keyboard': [
+                [
+                    {
+                        'text': 'Picture quiz',
+                        'callback_data': f'picture_quiz'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Description quiz',
+                        'callback_data': f'description_quiz'
+                    }
+                ]
+            ]
+        }
+    }
+    requests.post(url, json=payload)
