@@ -58,3 +58,22 @@ def get_gemini_response(prompt, chat_id):
 
 
 # get_gemini_response("What would you recommend me to watch?", chat_id=7653415)
+
+def send_message_with_keyboard(message, chat_id):
+    keyboard = {
+        'keyboard': [
+            [{'text': '/option1'}, {'text': '/option3'}],
+            [{'text': '/option2'}]
+        ],
+        'resize_keyboard': True
+    }
+    url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'reply_markup': json.dumps(keyboard)
+    }
+    requests.post(url, json=payload)
+
+# Замените "your_chat_id_here" на фактический идентификатор вашего чата
+send_message_with_keyboard(" ", 7653415)
