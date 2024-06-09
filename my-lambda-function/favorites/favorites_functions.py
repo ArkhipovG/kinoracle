@@ -3,6 +3,12 @@ import requests
 import boto3
 import keys
 from datetime import datetime
+import tmdbsimple as tmdb
+import json
+
+tmdb.API_KEY = keys.moviedb_token
+tmdb.REQUESTS_TIMEOUT = 5
+tmdb.REQUESTS_SESSION = requests.Session()
 
 REGION_NAME = 'us-east-1'  # Change this to your desired region
 
@@ -108,3 +114,53 @@ def remove_favorite_prompt(chat_id):
         }
     }
     r = requests.post(url, json=payload)
+
+def get_favorites2(chat_id):
+    response = dynamodb.query(
+        TableName='UserFavorites',
+        KeyConditionExpression='userId = :uid',
+        ExpressionAttributeValues={
+            ':uid': {'N': str(chat_id)}
+        }
+    )
+    favorites = response.get('Items', [])
+    if favorites:
+        favorites_string = "Your watchlist:\n"
+        results = []
+        if 'Items' in response and response['Items']:
+            for i, item in enumerate(response['Items'], start=1):
+                movie_title = item['movieTitle']['S']
+                movie_id = item['movieId']['N']
+                movie = tmdb.Movies(movie_id)
+                movie_info = movie.info()
+                movie_year = movie_info.get('release_date', 'N/A')
+                results.append({
+                    'id': movie_id,
+                    'title': movie_title,
+                    'release_date': movie_year,
+                })
+
+        else:
+            favorites_string += "You have no movies in watchlist yet."
+        send_favorites_choices(chat_id, results)
+    else:
+        send_message("You have no movies in watchlist.", chat_id)
+
+
+def send_favorites_choices(chat_id, movies):
+    keyboard = {
+        'inline_keyboard': [
+            [{'text': f"{movie['title']} ({movie['release_date'][:4] if movie['release_date'] else 'N/A'})",
+              'callback_data': f"movie_{movie['id']}"}] for movie in movies
+        ]
+    }
+    reply_markup = json.dumps(keyboard)
+    message = '💙 Your favorite movies:'
+
+    url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': message,
+        'reply_markup': reply_markup
+    }
+    requests.post(url, data=payload)

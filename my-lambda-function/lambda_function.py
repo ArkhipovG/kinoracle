@@ -108,9 +108,9 @@ def lambda_handler(event, context):
             elif data.startswith('movie_'):
                 searching_functions.handle_movie_callback(callback_query)
             elif data == "show_favorites":
-                favorites_functions.get_favorites(chat_id)
+                favorites_functions.get_favorites2(chat_id)
             elif data == "show_watchlist":
-                watchlist_functions.get_watchlist(chat_id)
+                watchlist_functions.get_watchlist2(chat_id)
             elif data == "popular_list":
                 lists_functions.get_popular_list(chat_id)
             elif data == "upcoming_list":
