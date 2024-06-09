@@ -115,6 +115,7 @@ def remove_favorite_prompt(chat_id):
     }
     r = requests.post(url, json=payload)
 
+
 def get_favorites2(chat_id):
     response = dynamodb.query(
         TableName='UserFavorites',
@@ -139,7 +140,6 @@ def get_favorites2(chat_id):
                     'title': movie_title,
                     'release_date': movie_year,
                 })
-
         else:
             favorites_string += "You have no movies in watchlist yet."
         send_favorites_choices(chat_id, results)

@@ -89,6 +89,7 @@ def get_watchlist(chat_id):
     else:
         send_message("You have no movies in watchlist.", chat_id, )
 
+
 def add_to_watchlist_prompt(chat_id):
     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
     payload = {
@@ -99,6 +100,7 @@ def add_to_watchlist_prompt(chat_id):
         }
     }
     r = requests.post(url, json=payload)
+
 
 def remove_from_watchlist_prompt(chat_id):
     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
@@ -136,13 +138,12 @@ def get_watchlist2(chat_id):
                     'title': movie_title,
                     'release_date': movie_year,
                 })
-
-                #favorites_string += f"{i}. '{movie_title}' (ID: {movie_id})\n"
         else:
             favorites_string += "You have no movies in watchlist yet."
         send_watchlist_choices(chat_id, results)
     else:
         send_message("You have no movies in watchlist.", chat_id)
+
 
 def send_watchlist_choices(chat_id, movies):
     keyboard = {
@@ -161,4 +162,3 @@ def send_watchlist_choices(chat_id, movies):
         'reply_markup': reply_markup
     }
     requests.post(url, data=payload)
-
