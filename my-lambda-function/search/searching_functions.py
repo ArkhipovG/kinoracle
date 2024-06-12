@@ -204,6 +204,8 @@ def handle_movie_callback(query):
     poster_url = search_movie_poster(movie_id)
     send_image(poster_url, chat_id)
     adding_buttons(chat_id, movie_id, movie_summary)
+    if chat_id == 7653415:
+        send_message(f'Here will be link :)', chat_id)
 
 
 def get_movie_details(movie_id):

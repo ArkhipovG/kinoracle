@@ -36,8 +36,8 @@ def send_image(image_url, chat_id):
 def send_message_with_keyboard(message, chat_id):
     keyboard = {
         'keyboard': [
-            [{'text': '🗂 Lists'}, {'text': '🔍 Search'}],
-            [{'text': '🧩 Quizzes'}, {'text': '🧩 Random'}]
+            [{'text': '🔍 Search'}, {'text': '🤖 Recommendations'}],
+            [{'text': '🗂 Lists'}, {'text': '🧩 Quizzes'}]
         ],
         'resize_keyboard': True
     }
@@ -144,8 +144,6 @@ def lambda_handler(event, context):
                 elif message['reply_to_message']['text'].startswith(
                         "Please tell me more about what you'd like to watch!"):
                     recommend.recommend_movie(text, chat_id)
-                # elif message['reply_to_message']['text'].startswith("If you already seen these movies"):
-                #     recommend.more_recommend_movie(chat_id)
             else:
                 if message and 'text' in message:
                     chat_id = message['chat']['id']
@@ -160,7 +158,8 @@ I'm here to help you find the perfect movie or series to watch. Here's what I ca
 🎥 <b>Recommendations</b>: Suggest what to watch tonight.
 ⭐ <b>Ratings</b>: Show you the top movies and series across various categories.
 🧩 <b>Quizzes</b>: Test your movie knowledge by guessing movies from banners or descriptions.
-📂 <b>Lists</b>: Create and manage your own lists of favorite movies or those you want to watch in the future.
+🗂 <b>Lists</b>: Create and manage your own lists of favorite movies or those you want to watch in the future.
+📊 <b>Dashboard</b>: <a href="https://public.tableau.com/app/profile/gregory.arkhipov/viz/MoviesDashboardPublic/MoviesDashboard">Interactive Dashboard</a> for searching movies.
 
 Use /help for a list of commands.
                         """
@@ -168,13 +167,11 @@ Use /help for a list of commands.
                         send_message(welcome_message, chat_id)
                     elif text == '/help':
                         help_message = ("Commands you can use: \n/start - Welcome message "
-                                        "\n/help - List of commands "
-                                        "\n/search_movie - Find summary about a movie "
-                                        "\n/recommend - Get personalized movie suggestions"
-                                        "\n/quizzes - Guess the movie by description "
-                                        "\n/favorites - List of your favorite movies"
-                                        "\n/watchlist - List of movies you want to watch in the future "
-                                        "\n/manage_lists - Manage lists commands")
+                                        "\n/dashboard - Interactive dashboard\n"
+                                        "\n🔍 Search - Find summary about a movie "
+                                        "\n🤖 Recommendations - Get personalized movie suggestions"
+                                        "\n🧩 Quizzes - Guess the movie by description "
+                                        "\n🗂 Lists - Different Lists of movies")
                         send_message_with_keyboard(help_message, chat_id)
                     elif text == '/manage_lists':
                         help_message = ("Commands you can use to manage your lists: "
@@ -185,10 +182,14 @@ Use /help for a list of commands.
                         send_message(help_message, chat_id)
                     elif text == '🧩 Quizzes':
                         quiz_functions.quiz_buttons(chat_id)
-                    elif text == '/recommend':
+                    elif text == '🤖 Recommendations':
                         recommend.recommend_message(chat_id)
                     elif text == '🗂 Lists':
                         lists_functions.list_buttons(chat_id)
+                    elif text == '/dashboard':
+                        dashboard_message = ('📊 Explore various rankings by movies, genres, countries, production companies and other parameters\n'
+                                             '<a href="https://public.tableau.com/app/profile/gregory.arkhipov/viz/MoviesDashboardPublic/MoviesDashboard">Interactive Dashboard</a> ')
+                        send_message(dashboard_message, chat_id)
                     elif text == '/keyboard':
                         disable_keyboard(chat_id)
                     elif text == '🔍 Search':

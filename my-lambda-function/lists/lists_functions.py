@@ -12,7 +12,7 @@ def list_buttons(chat_id):
     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
     payload = {
         'chat_id': chat_id,
-        'text': "🗂 Lists of Movies and TV Shows\n\n 🍿 Enjoy watching 🍿",
+        'text': "🍿 Lists of Movies and TV Shows 🍿",
         'reply_markup': {
             'inline_keyboard': [
                 [
