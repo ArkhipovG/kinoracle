@@ -7,8 +7,9 @@
 ## Features
 
 - **Movie and TV Show Suggestions**: Get tailored recommendations based on your preferences.
-- **Ratings and Rankings**: Access various rankings by movies, actors, countries, and other parameters.
-- **Interactive Quizzes**: Test your knowledge with fun quizzes like guessing movies from posters or descriptions.
+- **Search**: Find information about any movie or TV show in huge database.
+- **Charts and Ratings**: Receive latest updates with popular or upcoming movies and TV shows.
+- **Collections and Recommendations**: Look through movie collections and recommendations based on any of them.
+- **Interactive Quizzes**: Test your knowledge with fun quizzes like guessing movies from pictures or descriptions.
 - **Personal Lists**: Create and manage your favorite movies or watchlist for future viewing.
-- **Cinematic Wisdom**: Benefit from curated content and expert advice to navigate the vast landscape of cinema.
-
+- **Interactive Dashboard**: Explore various rankings by movies, genres, countries, production companies and other parameters. 
