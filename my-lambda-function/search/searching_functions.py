@@ -2,6 +2,7 @@ import keys
 import requests
 import tmdbsimple as tmdb
 import json
+from bs4 import BeautifulSoup
 
 tmdb.API_KEY = keys.moviedb_token
 tmdb.REQUESTS_TIMEOUT = 5
@@ -65,6 +66,57 @@ def adding_buttons(chat_id, movie_id, movie_summary):
                     {
                         'text': 'Collection',
                         'callback_data': f'collection {movie_id}'
+                    }
+                ]
+            ]
+        }
+    }
+    requests.post(url, json=payload)
+
+
+def adding_buttons_forme(chat_id, movie_id, movie_summary):
+    url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
+    payload = {
+        'chat_id': chat_id,
+        'text': movie_summary,
+        'reply_markup': {
+            'inline_keyboard': [
+                [
+                    {
+                        'text': 'Add to watchlist',
+                        'callback_data': f'add_to_watchlist {movie_id}'
+                    },
+                    {
+                        'text': 'Add to favorites',
+                        'callback_data': f'add_to_favorites {movie_id}'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Remove from favorites',
+                        'callback_data': f'remove_from_favorites {movie_id}'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Remove from watchlist',
+                        'callback_data': f'remove_from_watchlist {movie_id}'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Recommendations',
+                        'callback_data': f'recommendations {movie_id}'
+                    },
+                    {
+                        'text': 'Collection',
+                        'callback_data': f'collection {movie_id}'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Get link',
+                        'callback_data': f'get_link {movie_id}'
                     }
                 ]
             ]
@@ -203,30 +255,33 @@ def handle_movie_callback(query):
     movie_summary = get_movie_details(movie_id)
     poster_url = search_movie_poster(movie_id)
     send_image(poster_url, chat_id)
-    adding_buttons(chat_id, movie_id, movie_summary)
     if chat_id == 7653415:
-        send_message(f'Here will be link :)', chat_id)
+        adding_buttons_forme(chat_id, movie_id, movie_summary)
+    else:
+        adding_buttons(chat_id, movie_id, movie_summary)
 
 
 def get_movie_details(movie_id):
     movie = tmdb.Movies(movie_id)
     movie_info = movie.info()
-
+    credits = movie.credits()
+    cast = credits['cast']
+    crew = credits['crew']
     movie_title = movie_info.get('title', 'N/A')
     movie_year = movie_info.get('release_date', 'N/A')
     movie_rating = movie_info.get('vote_average', 'N/A')
     movie_genres = [genre['name'] for genre in movie_info.get('genres', [])]
     movie_overview = movie_info.get('overview', 'N/A')
-    movie_collection = movie_info['belongs_to_collection']['name'] if 'belongs_to_collection' in movie_info and \
-                                                                      movie_info['belongs_to_collection'] else "N/A"
+    movie_cast = [actor['name'] for actor in cast]
+    movie_directors = [member['name'] for member in crew if member['job'] == 'Director']
 
     movie_summary = f'''
 🎥 🍿 {movie_title} ({movie_year[:4]}) 
-
+🎬 Director: {', '.join(movie_directors)}
 ⭐ Rating: {movie_rating}\n
 🎭 Genres: {", ".join(movie_genres)}\n
-🎞 Collection: {movie_collection}\n
-💬 Overview: {movie_overview}
+💬 Overview: {movie_overview}\n
+👥 Cast: {", ".join(movie_cast[:10])}\n
     '''
     return movie_summary
 
@@ -238,4 +293,25 @@ def send_movie_details(chat_id, movie_summary):
         'text': movie_summary
     }
     requests.post(url, data=payload)
+
+
+def get_kinopoisk_url(movie_id):
+    movie = tmdb.Movies(movie_id)
+    movie_info = movie.info()
+    movie_title = movie_info.get('title', 'N/A')
+    kinopoisk_search_url = f'https://www.kinopoisk.ru/index.php?kp_query={movie_title}'
+    kinopoisk_search_page = requests.get(kinopoisk_search_url)
+    kinopoisk_soup = BeautifulSoup(kinopoisk_search_page.content, 'html.parser')
+
+    # Находим первый результат поиска
+    result_div = kinopoisk_soup.find('div', class_='element most_wanted')
+    if result_div:
+        # Получаем ссылку на страницу фильма на Кинопоиске
+        kinopoisk_link = result_div.find('div', class_='info').find('a')['href']
+        kinopoisk_full_url = f'https://www.kinopoisk.ru{kinopoisk_link}'
+        # Заменяем 'kino' на 'ss' в URL
+        modified_url = kinopoisk_full_url.replace('/sr/1/', '').replace('kino', 'ss')
+        return modified_url
+    else:
+        return None
 

@@ -37,7 +37,8 @@ def send_message_with_keyboard(message, chat_id):
     keyboard = {
         'keyboard': [
             [{'text': '🔍 Search'}, {'text': '🤖 Recommendations'}],
-            [{'text': '🗂 Lists'}, {'text': '🧩 Quizzes'}]
+            [{'text': '🗂 Lists'}, {'text': '🧩 Quizzes'}],
+            [{'text': '📊 Dashboard'}, {'text': '🧩 Quizzes'}]
         ],
         'resize_keyboard': True
     }
@@ -103,6 +104,13 @@ def lambda_handler(event, context):
                     searching_functions.send_recommendation_movie_choices(chat_id, movies)
                 else:
                     send_message("Sorry, I couldn't find recommendations", chat_id)
+            elif data.startswith('get_link'):
+                movie_id = int(data.split(' ')[1])
+                watch_link = searching_functions.get_kinopoisk_url(movie_id)
+                if watch_link:
+                    send_message(watch_link, chat_id)
+                else:
+                    send_message("Sorry, I cant find the ", chat_id)
             elif data == 'more_movies':
                 recommend.more_recommend_movie(chat_id)
             elif data.startswith('movie_'):
@@ -186,9 +194,8 @@ Use /help for a list of commands.
                         recommend.recommend_message(chat_id)
                     elif text == '🗂 Lists':
                         lists_functions.list_buttons(chat_id)
-                    elif text == '/dashboard':
-                        dashboard_message = ('📊 Explore various rankings by movies, genres, countries, production companies and other parameters\n'
-                                             '<a href="https://public.tableau.com/app/profile/gregory.arkhipov/viz/MoviesDashboardPublic/MoviesDashboard">Interactive Dashboard</a> ')
+                    elif text == '📊 Dashboard':
+                        dashboard_message = '<a href="https://public.tableau.com/app/profile/gregory.arkhipov/viz/MoviesDashboardPublic/MoviesDashboard">Interactive Dashboard</a>'
                         send_message(dashboard_message, chat_id)
                     elif text == '/keyboard':
                         disable_keyboard(chat_id)
