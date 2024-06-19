@@ -8,7 +8,7 @@ tmdb.API_KEY = keys.moviedb_token
 tmdb.REQUESTS_TIMEOUT = 5
 tmdb.REQUESTS_SESSION = requests.Session()
 
-
+allowed_list = [7653415, 422308911]
 def send_message(message, chat_id):
     url = f'https://api.telegram.org/bot{keys.telegram_token}/sendMessage'
     payload = {
@@ -248,7 +248,7 @@ def handle_tv_callback(query):
     movie_summary = get_tv_details(movie_id)
     poster_url = search_tv_poster(movie_id)
     send_image(poster_url, chat_id)
-    if chat_id == 7653415:
+    if chat_id in allowed_list:
         adding_tv_buttons_forme(chat_id, movie_id, movie_summary)
     else:
         adding_tv_buttons(chat_id, movie_id, movie_summary)

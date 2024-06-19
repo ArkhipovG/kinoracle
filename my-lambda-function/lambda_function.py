@@ -135,6 +135,14 @@ def lambda_handler(event, context):
                 picture_quiz_functions.start_banner_quiz(chat_id)
             elif data == "description_quiz":
                 quiz_functions.start_quiz(chat_id)
+            elif data == "pop_picture_quiz":
+                picture_quiz_functions.start_pop_banner_quiz(chat_id)
+            elif data == "pop_description_quiz":
+                quiz_functions.start_pop_quiz(chat_id)
+            elif data == "top_rated_quiz":
+                quiz_functions.quiz_buttons(chat_id)
+            elif data == "top_popular_quiz":
+                quiz_functions.quiz_pop_buttons(chat_id)
 
             answer_callback_query(callback_query['id'])
         elif 'message' in body:
@@ -183,12 +191,13 @@ Use /help for a list of commands.
 
                         send_message(welcome_message, chat_id)
                     elif text == '/help':
-                        help_message = ("Commands you can use: \n/start - Welcome message "
-                                        "\n/dashboard - Interactive dashboard\n"
-                                        "\n🔍 Search - Find summary about a movie "
-                                        "\n🤖 Recommendations - Get personalized movie suggestions"
-                                        "\n🧩 Quizzes - Guess the movie by description "
-                                        "\n🗂 Lists - Different Lists of movies")
+                        help_message = ("Commands you can use: \n/start - Welcome message\n"
+                                        "\n🗂 Lists \nDifferent Lists of movies and TV shows\n"
+                                        "\n🤖 Recommendations \nGet personalized movie suggestions\n"
+                                        "\n🔍 Search Movies/TV Shows \nFind summary about a movie or TV show\n"
+                                        "\n📊 Dashboard \nInteractive dashboard\n"
+                                        "\n🧩 Quizzes \nGuess the movie by description\n"
+                                        )
                         send_message_with_keyboard(help_message, chat_id)
                     elif text == '/manage_lists':
                         help_message = ("Commands you can use to manage your lists: "
@@ -198,7 +207,7 @@ Use /help for a list of commands.
                                         "\n/remove_from_watchlist - Remove from watchlist")
                         send_message(help_message, chat_id)
                     elif text == '🧩 Quizzes':
-                        quiz_functions.quiz_buttons(chat_id)
+                        quiz_functions.type_quiz_buttons(chat_id)
                     elif text == '🤖 Recommendations':
                         recommend.recommend_message(chat_id)
                     elif text == '🗂 Lists':
