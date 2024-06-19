@@ -301,7 +301,23 @@ def get_kinopoisk_url(movie_id):
     movie_title = movie_info.get('title', 'N/A')
     kinopoisk_search_url = f'https://www.kinopoisk.ru/index.php?kp_query={movie_title}'
     kinopoisk_search_page = requests.get(kinopoisk_search_url)
+    print(kinopoisk_search_page.url)
     kinopoisk_soup = BeautifulSoup(kinopoisk_search_page.content, 'html.parser')
+
+    # Проверяем, не является ли текущий URL страницей фильма или перенаправлением
+    if 'film' in kinopoisk_search_page.url:
+        original_url = kinopoisk_search_page.url
+        # Находим начало параметра 'retpath=' и его значение
+        start = original_url.find("retpath=") + len("retpath=")
+        end = original_url.find("&", start)
+        if end == -1:  # Если '&' не найден, это значит, что retpath идет до конца строки
+            end = len(original_url)
+
+        # Извлекаем и декодируем значение параметра 'retpath'
+        encoded_retpath = original_url[start:end]
+        decoded_retpath = encoded_retpath.replace('%3A', ':').replace('%2F', '/')
+        modified_url = decoded_retpath.replace('kino', 'ss')
+        return modified_url
 
     # Находим первый результат поиска
     result_div = kinopoisk_soup.find('div', class_='element most_wanted')
@@ -310,7 +326,7 @@ def get_kinopoisk_url(movie_id):
         kinopoisk_link = result_div.find('div', class_='info').find('a')['href']
         kinopoisk_full_url = f'https://www.kinopoisk.ru{kinopoisk_link}'
         # Заменяем 'kino' на 'ss' в URL
-        modified_url = kinopoisk_full_url.replace('/sr/1/', '').replace('kino', 'ss')
+        modified_url = kinopoisk_full_url.replace('kino', 'ss').replace('/sr/1/', '')
         return modified_url
     else:
         return None

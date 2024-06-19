@@ -3,13 +3,14 @@ import requests
 import keys
 from quiz import quiz_functions
 from quiz import picture_quiz_functions
-from search import searching_functions
+from search import searching_functions, searching_tv_functions
 from favorites import favorites_functions
 from watchlist import watchlist_functions
 from gemini_api import recommend
-from lists import lists_functions
+from lists import lists_functions, lists_tv_functions
 
-search_state = {}
+search_movie_state = {}
+search_tv_state = {}
 
 
 def send_message(message, chat_id):
@@ -36,8 +37,8 @@ def send_image(image_url, chat_id):
 def send_message_with_keyboard(message, chat_id):
     keyboard = {
         'keyboard': [
-            [{'text': '🔍 Search'}, {'text': '🤖 Recommendations'}],
-            [{'text': '🗂 Lists'}, {'text': '🧩 Quizzes'}],
+            [{'text': '🗂 Lists'}, {'text': '🤖 Recommendations'}],
+            [{'text': '🔍 Search Movies'}, {'text': '🔍 Search TV Shows'}],
             [{'text': '📊 Dashboard'}, {'text': '🧩 Quizzes'}]
         ],
         'resize_keyboard': True
@@ -77,6 +78,7 @@ def lambda_handler(event, context):
             callback_query = body['callback_query']
             chat_id = callback_query['message']['chat']['id']
             data = callback_query['data']
+            #send_message(body, chat_id)
 
             if data.startswith('add_to_watchlist'):
                 movie_id = data.split(' ')[1]
@@ -90,14 +92,14 @@ def lambda_handler(event, context):
             elif data.startswith('remove_from_watchlist'):
                 movie_id = data.split(' ')[1]
                 watchlist_functions.remove_from_watchlist(chat_id, movie_id)
-            elif data.startswith('collection'):
+            elif data.startswith('collection '):
                 movie_id = int(data.split(' ')[1])
                 collection_movies = searching_functions.search_colletion_movies(movie_id)
                 if collection_movies:
                     searching_functions.send_collection_choices(chat_id, collection_movies)
                 else:
                     send_message("This movie has no collection", chat_id)
-            elif data.startswith('recommendations'):
+            elif data.startswith('recommendations '):
                 movie_id = int(data.split(' ')[1])
                 movies = searching_functions.search_recommend_movies(movie_id)
                 if movies:
@@ -110,11 +112,13 @@ def lambda_handler(event, context):
                 if watch_link:
                     send_message(watch_link, chat_id)
                 else:
-                    send_message("Sorry, I cant find the ", chat_id)
+                    send_message("Sorry, I cant find the link", chat_id)
             elif data == 'more_movies':
                 recommend.more_recommend_movie(chat_id)
             elif data.startswith('movie_'):
                 searching_functions.handle_movie_callback(callback_query)
+            elif data.startswith('tv_'):
+                searching_tv_functions.handle_tv_callback(callback_query)
             elif data == "show_favorites":
                 favorites_functions.get_favorites2(chat_id)
             elif data == "show_watchlist":
@@ -123,6 +127,10 @@ def lambda_handler(event, context):
                 lists_functions.get_popular_list(chat_id)
             elif data == "upcoming_list":
                 lists_functions.get_upcoming_list(chat_id)
+            elif data == "popular_tv_list":
+                lists_tv_functions.get_popular_tv_list(chat_id)
+            elif data == "airing_list":
+                lists_tv_functions.get_on_the_air_list(chat_id)
             elif data == "picture_quiz":
                 picture_quiz_functions.start_banner_quiz(chat_id)
             elif data == "description_quiz":
@@ -133,6 +141,7 @@ def lambda_handler(event, context):
             text = body['message']['text']
             message = body.get('message')
             chat_id = message['chat']['id']
+            #send_message(body, chat_id)
             if 'reply_to_message' in body['message']:
                 # Handle the reply to the force reply message
                 if message['reply_to_message']['text'] == "Please reply with the movie ID to add to your watchlist:":
@@ -199,9 +208,12 @@ Use /help for a list of commands.
                         send_message(dashboard_message, chat_id)
                     elif text == '/keyboard':
                         disable_keyboard(chat_id)
-                    elif text == '🔍 Search':
-                        send_message("What movie would you like to find? Please enter the movie name.", chat_id)
-                        search_state[chat_id] = True
+                    elif text == '🔍 Search Movies':
+                        send_message("What movie would you like to find? Please enter the name.", chat_id)
+                        search_movie_state[chat_id] = True
+                    elif text == '🔍 Search TV Shows':
+                        send_message("What TV show would you like to find? Please enter the name.", chat_id)
+                        search_tv_state[chat_id] = True
                     elif text.startswith('/add_favorite'):
                         if text == '/add_favorite':
                             favorites_functions.add_favorite_prompt(chat_id)
@@ -233,13 +245,20 @@ Use /help for a list of commands.
                             quiz_functions.check_answer(chat_id, text)
                         elif chat_id in picture_quiz_functions.user_state:
                             picture_quiz_functions.check_user_state(chat_id, text)
-                        elif chat_id in search_state:
+                        elif chat_id in search_movie_state:
                             movies = searching_functions.search_movies(text)
                             if movies:
                                 searching_functions.send_movie_choices(chat_id, movies)
                             else:
                                 send_message("Sorry, I couldn't find information.", chat_id)
-                            del search_state[chat_id]
+                            del search_movie_state[chat_id]
+                        elif chat_id in search_tv_state:
+                            movies = searching_tv_functions.search_tv(text)
+                            if movies:
+                                searching_tv_functions.send_tv_choices(chat_id, movies)
+                            else:
+                                send_message("Sorry, I couldn't find information.", chat_id)
+                            del search_tv_state[chat_id]
                         else:
                             unknown_command_message = "Sorry, I don't understand this command. Use /help for a list of commands."
                             send_message(unknown_command_message, chat_id)

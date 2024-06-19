@@ -27,12 +27,22 @@ def list_buttons(chat_id):
                 ],
                 [
                     {
-                        'text': 'Popular',
+                        'text': 'Popular Movies',
                         'callback_data': f'popular_list'
                     },
                     {
-                        'text': 'Upcoming',
+                        'text': 'Upcoming Movies',
                         'callback_data': f'upcoming_list'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Popular TV Shows',
+                        'callback_data': f'popular_tv_list'
+                    },
+                    {
+                        'text': 'Airing TV Shows',
+                        'callback_data': f'airing_list'
                     }
                 ]
             ]
@@ -60,7 +70,7 @@ def get_popular_list(chat_id):
         ]
     }
     reply_markup = json.dumps(keyboard)
-    message = 'Popular list:'
+    message = '🔥 Popular Movies:'
 
     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
     payload = {
@@ -89,7 +99,7 @@ def get_upcoming_list(chat_id):
         ]
     }
     reply_markup = json.dumps(keyboard)
-    message = 'Upcoming Movies:'
+    message = '🚀 Upcoming Movies:'
 
     url = f"https://api.telegram.org/bot{keys.telegram_token}/sendMessage"
     payload = {
