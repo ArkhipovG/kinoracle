@@ -143,6 +143,16 @@ def lambda_handler(event, context):
                 quiz_functions.quiz_buttons(chat_id)
             elif data == "top_popular_quiz":
                 quiz_functions.quiz_pop_buttons(chat_id)
+            elif data.startswith("release_dates"):
+                movie_id = int(data.split(' ')[1])
+                searching_tv_functions.get_last_season_episode_dates(movie_id, chat_id)
+            elif data.startswith('link_tv_get_link'):
+                movie_id = int(data.split(' ')[1])
+                watch_link = searching_tv_functions.get_kinopoisk_url(movie_id)
+                if watch_link:
+                    send_message(watch_link, chat_id)
+                else:
+                    send_message("Sorry, I cant find the link", chat_id)
 
             answer_callback_query(callback_query['id'])
         elif 'message' in body:

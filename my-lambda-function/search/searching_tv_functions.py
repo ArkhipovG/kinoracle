@@ -64,8 +64,8 @@ def adding_tv_buttons(chat_id, movie_id, movie_summary):
                         'callback_data': f'tv_recommendations {movie_id}'
                     },
                     {
-                        'text': 'Collection',
-                        'callback_data': f'collection_tv {movie_id}'
+                        'text': 'Release dates',
+                        'callback_data': f'release_dates {movie_id}'
                     }
                 ]
             ]
@@ -109,8 +109,14 @@ def adding_tv_buttons_forme(chat_id, movie_id, movie_summary):
                         'callback_data': f'recommendations_tv {movie_id}'
                     },
                     {
-                        'text': 'Collection',
-                        'callback_data': f'collection_tv {movie_id}'
+                        'text': 'Release dates',
+                        'callback_data': f'release_dates {movie_id}'
+                    }
+                ],
+                [
+                    {
+                        'text': 'Get link',
+                        'callback_data': f'link_tv_get_link {movie_id}'
                     }
                 ]
             ]
@@ -289,9 +295,9 @@ def get_tv_details(movie_id):
 
 
 def get_kinopoisk_url(movie_id):
-    movie = tmdb.Movies(movie_id)
+    movie = tmdb.TV(movie_id)
     movie_info = movie.info()
-    movie_title = movie_info.get('title', 'N/A')
+    movie_title = movie_info.get('name', 'N/A')
     kinopoisk_search_url = f'https://www.kinopoisk.ru/index.php?kp_query={movie_title}'
     kinopoisk_search_page = requests.get(kinopoisk_search_url)
     print(kinopoisk_search_page.url)
@@ -324,3 +330,37 @@ def get_kinopoisk_url(movie_id):
     else:
         return None
 
+def get_last_season_episode_dates(tv_show_id, chat_id):
+    API_KEY = keys.moviedb_token
+    BASE_URL = 'https://api.themoviedb.org/3'
+    # Получение информации о сезонах
+    tv_url = f'{BASE_URL}/tv/{tv_show_id}?api_key={API_KEY}'
+    response = requests.get(tv_url).json()
+    seasons = response['seasons']
+
+    # Найти последний сезон
+    last_season = max(seasons, key=lambda x: x['season_number'])
+    if last_season['air_date']:
+        last_season_number = last_season['season_number']
+    else:
+        last_season_number = last_season['season_number'] - 1
+
+    # Получение информации о последнем сезоне
+    season_url = f'{BASE_URL}/tv/{tv_show_id}/season/{last_season_number}?api_key={API_KEY}'
+    season_details = requests.get(season_url).json()
+    episodes = season_details['episodes']
+
+    # Создание словаря для хранения дат выхода серий последнего сезона
+    episode_dates = {}
+
+    for episode in episodes:
+        episode_number = episode['episode_number']
+        air_date = episode['air_date']
+        episode_dates[f'Season {last_season_number} Episode {episode_number}'] = air_date
+
+    release_dates = ""
+
+    for episode, date in episode_dates.items():
+        release_dates += f"{episode}: {date}\n"
+
+    send_message(release_dates, chat_id)
